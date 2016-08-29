@@ -1,0 +1,267 @@
+#%RAML 1.0
+title: Zing API
+# This is the v2 of the Zing api for Zing  Auto Enterprises
+version: v2
+protocols: [ HTTP,HTTPS ]
+baseUri: http://au.com.zing/api
+mediaType: application/json
+
+securedBy: [basicAuth]
+securitySchemes:
+  basicAuth:
+    type: Basic Authentication
+    description: |
+      This API supports Basic Authentication. Soon to be updated with OAuth2
+types:
+    Customer: !include resourceTypes/customer.raml
+    Product: !include resourceTypes/product.raml
+    Order: !include resourceTypes/order.raml
+
+    fields: # fields required to return on get
+      properties:
+        firsName: string
+        suburb: string
+        lastName: string
+    sort: #  feilds for sorting
+      properties:
+        firsName?: string
+        lastName?: string
+    paging: # each is optional, not exclusive with anything
+      properties:
+        offset?: number
+        limit?: number
+
+resourceTypes:
+   collection: !include resourceTypes/collection.raml
+
+/v2:
+  /customers:
+      get:
+        securedBy: [basicAuth]
+        description: |
+          Retrieve all customers
+        queryString:
+          type: [fields|sort|paging]
+        responses:
+          200:
+            body:
+              type: Customer[]
+              example: !include examples/customers.json
+          400:
+            description: BAD REQUEST
+            body:
+                application/json:
+                    example: |
+                        {"error": "Bad Request"}
+
+          500:
+            description: |
+              Unable to find any customers
+      post:
+       description: Create a new customer
+       body:
+          application/json:
+            type: Customer
+            example: !include examples/customer.json
+
+       responses:
+        201:
+          body:
+            application/json:
+        500:
+            description: |
+              Unable to create the new customer
+
+      /{id}:
+        get:
+         description: Retrieve the Customer Details for the given Customer Id
+         responses:
+           200:
+             body:
+               application/json:
+                 type: Customer
+           404:
+             description:
+               Unable to find Customer Details with the given Customer id
+        put:
+          description: |
+           Update Customer Details of the given Customer
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Customer
+            500:
+              description: |
+                Unable to update Customer Details
+        delete:
+          description: Delete a given Customer
+          responses:
+            200:
+              body:
+                application/json:
+
+            500:
+              description:
+                Unable to delete Customer
+        patch:
+          description: |
+           Update only specific Customer details
+          responses:
+            200:
+              body:
+                application/json:
+                  type: string
+            500:
+              description: |
+                Unable to update Customer Details
+        /orders:
+            get:
+              queryString:
+                type: [fields|sort|paging]
+              description: |
+                Retrieve all orders for the customer
+              responses:
+                200:
+                  body:
+                    type: Order[]
+                400:
+                 description: BAD REQUEST
+                 body:
+                     application/json:
+                         example: |
+                             {"error": "Bad Request"}
+
+                500:
+                  description: |
+                    Unable to find any order for this customer
+            post:
+             description: Create a new order
+             body:
+                application/json:
+                  type: Order
+                  example: !include examples/order.json
+
+             responses:
+              201:
+                body:
+                  application/json:
+              500:
+                  description: |
+                    Unable to create the new order for this customer
+
+            /{oid}:
+              get:
+               description: Retrieve the order for the given Customer Id
+               responses:
+                 200:
+                   body:
+                     application/json:
+                       type: Order
+                 404:
+                   description:
+                     Unable to find order details with the given Customer id
+              put:
+                description: |
+                 Update order details for the given Customer
+                responses:
+                  200:
+                    body:
+                      application/json:
+                        type: Order
+                  500:
+                    description: |
+                      Unable to update Customer Details
+              delete:
+                description: Delete a order for the given Customer
+                responses:
+                  200:
+                    body:
+                      application/json:
+
+                  500:
+                    description:
+                      Unable to delete a order for the customer
+              patch:
+                description: |
+                 Update only specific order details
+                responses:
+                  200:
+                    body:
+                      application/json:
+                        type: string
+                  500:
+                    description: |
+                      Unable to update order details
+  /products:
+        get:
+          securedBy: [null, basicAuth]
+          queryString:
+            type: [fields|sort|paging]
+          description: |
+            Retrieve all products
+          responses:
+            200:
+              body:
+                type: Product[]
+
+            500:
+              description: |
+                Unable to find any products
+        post:
+         description: Create a new product
+         body:
+            application/json:
+              type: Product
+              example: !include examples/product.json
+
+         responses:
+          201:
+            body:
+              application/json:
+          500:
+              description: |
+                Unable to create the new product
+        /{pid}:
+          get:
+           description: Retrieve the product details
+           responses:
+             200:
+               body:
+                 application/json:
+                   type: Product
+             404:
+               description:
+                 Unable to find product details with the given product id
+          put:
+            description: |
+             Update product details of the given product
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: Product
+              500:
+                description: |
+                  Unable to update product details
+          delete:
+            description: Delete a given product
+            responses:
+              200:
+                body:
+                  application/json:
+
+              500:
+                description:
+                  Unable to delete product
+          patch:
+            description: |
+             Update only specific product details
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: string
+              500:
+                description: |
+                  Unable to update product details

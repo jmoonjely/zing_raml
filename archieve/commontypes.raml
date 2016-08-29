@@ -1,0 +1,15 @@
+#%RAML 1.0 Library
+types:
+ fields: # feilds required to return on get
+  properties:
+    firsName: string
+    postCode: string
+    lastName: string
+ sort: # location required; mutually exclusive with lat & long
+  properties:
+    firsName?: string
+    lastName?: string
+ paging: # each is optional, not exclusive with anything
+  properties:
+    offset?: number
+    limit?: number
