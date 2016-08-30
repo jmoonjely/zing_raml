@@ -18,20 +18,24 @@ types:
     Product: !include resourceTypes/product.raml
     Order: !include resourceTypes/order.raml
     
-#Below section will be moved to the common types
-    fields: # fields required to return on get
-      properties:
-        firsName: string
-        suburb: string
-        lastName: string
-    sort: #  feilds for sorting
-      properties:
-        firsName?: string
-        lastName?: string
-    paging: # each is optional, not exclusive with anything
-      properties:
-        offset?: number
-        limit?: number
+#Below section will be moved to traits
+traits:
+  fields: # feilds required to return on get
+      description: parameters for the fields to return
+      queryParameters:
+       firsName: string
+       postCode: string
+       lastName: string
+  sort: #
+    description: parameters for sorting
+    queryParameters:
+     firsName?: string
+     lastName?: string
+  paging: # each is optional, not exclusive with anything
+    description: parameters for query
+    queryParameters:
+       offset?: number
+       limit?: number
         
 #Customer collection sample is moved to collection.raml
 resourceTypes:
@@ -40,11 +44,11 @@ resourceTypes:
 /v2:
   /customers:
       get:
+        is: [fields,sort,paging]
         securedBy: [basicAuth]
         description: |
           Retrieve all customers
-        queryString:
-          type: [fields|sort|paging]
+         
         responses:
           200:
             body:
@@ -122,8 +126,7 @@ resourceTypes:
                 Unable to update Customer Details
         /orders:
             get:
-              queryString:
-                type: [fields|sort|paging]
+              is: [fields,sort,paging]
               description: |
                 Retrieve all orders for the customer
               responses:
@@ -203,8 +206,7 @@ resourceTypes:
   /products:
         get:
           securedBy: [null, basicAuth]
-          queryString:
-            type: [fields|sort|paging]
+          is: [fields,sort,paging]
           description: |
             Retrieve all products
           responses:
